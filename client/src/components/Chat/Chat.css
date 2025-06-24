@@ -32,3 +32,19 @@
     width: 60%;
   }
 }
+
+.errorMessage {
+  color: red;
+  text-align: center;
+  padding: 5px 0;
+  margin-bottom: 10px; /* Add some space before the input bar */
+}
+
+.connectionStatusMessage {
+  text-align: center;
+  padding: 5px 0;
+  margin-bottom: 10px;
+  color: #666; /* A neutral grey color */
+  font-style: italic;
+  font-size: 0.9em;
+}
