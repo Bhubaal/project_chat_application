@@ -1,21 +1,27 @@
 .textContainer {
   display: flex;
   flex-direction: column;
-  margin-left: 100px; /* This positions it to the right of the chat container */
+  /* margin-left: 100px; */ /* Removed, now on the left */
+  margin-right: 20px; /* Space between sidebar and chat window */
   color: white;
-  height: 60%; /* Maintain original height relative to viewport */
-  /* justify-content: space-between; */ /* Changed due to single content block */
-  justify-content: flex-start; /* Content starts from the top */
-  width: 25%; /* Give it a defined width */
+  /* height: 60%; */ /* Original height */
+  height: auto; /* Content defines height */
+  max-height: 50vh; /* Shortened: max 50% of viewport height */
+  min-height: 150px; /* Ensure a minimum presence */
+  justify-content: flex-start;
+  /* width: 25%; */ /* Original width */
+  width: 220px; /* Narrower sidebar width */
   padding: 20px;
-  overflow-y: auto; /* Handle long user lists */
+  overflow-y: auto;
 
-  background: rgba(255, 255, 255, 0.08); /* Subtle glass */
+  /* background: rgba(255, 255, 255, 0.08); */ /* Original subtle glass */
+  background: rgba(160, 100, 220, 0.25); /* Glassy purple vibrant */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  /* box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1); */ /* Optional subtle shadow */
+  /* border: 1px solid rgba(255, 255, 255, 0.15); */ /* Original border */
+  border: 1px solid rgba(160, 100, 220, 0.4); /* Purple border */
+  /* box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1); */
 }
 
 .activeContainer {

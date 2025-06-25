@@ -113,6 +113,7 @@ const Chat = ({ location }) => {
 
   return (
     <div className="outerContainer">
+      <TextContainer users={users}/> {/* Moved to be before the main chat container */}
       <div className="container">
           <InfoBar room={room} />
           {connectionStatus && connectionStatus !== 'connected' && <p className="connectionStatusMessage">{connectionStatus}</p>}
@@ -125,7 +126,6 @@ const Chat = ({ location }) => {
             setError={setError}
           />
       </div>
-      <TextContainer users={users}/>
     </div>
   );
 }
