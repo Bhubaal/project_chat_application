@@ -84,38 +84,45 @@ const Chat = ({ location }) => {
     socket.on('message', (receivedMessageFromServer) => {
       setMessages((prevMessages) => {
         // Check if this is an echo of a message sent by the current user
-        if (receivedMessageFromServer.user === name) {
-          // Try to find the optimistic message to update it
-          // This simple heuristic assumes the last 'sending' message with matching text is the one.
-          // A more robust solution would involve matching by a temporary ID.
-          let foundOptimistic = false;
+        if (receivedMessageFromServer.user === name && receivedMessageFromServer.tempId) {
+          // This is an echo of a message sent by the current user, identified by tempId
+          let messageUpdated = false;
           const updatedMessages = prevMessages.map(msg => {
-            if (msg.status === 'sending' && msg.text === receivedMessageFromServer.text && !foundOptimistic) {
-              foundOptimistic = true;
+            if (msg.id === receivedMessageFromServer.tempId) { // Match optimistic message by its tempId
+              messageUpdated = true;
               return {
-                ...msg,
-                id: receivedMessageFromServer.id, // Update with server ID
-                status: 'sent', // Update status
-                                // Server timestamp should be preferred if available and reliable
-                timestamp: receivedMessageFromServer.timestamp || msg.timestamp,
+                ...msg, // Keep other optimistic properties like original text if needed
+                id: receivedMessageFromServer.id, // Update with the final server-assigned ID
+                status: 'sent',                 // Update status
+                timestamp: receivedMessageFromServer.timestamp || msg.timestamp, // Prefer server timestamp
+                // text: receivedMessageFromServer.text, // Usually same, but server is source of truth
               };
             }
             return msg;
           });
 
-          if (foundOptimistic) {
+          if (messageUpdated) {
             return updatedMessages;
           } else {
-            // If no optimistic message was found (e.g., if it's a message from another tab/device, or logic error)
-            // still add it, but ensure it has the 'sent' status if it's from the current user.
+            // This case should ideally not happen if tempId logic is correct.
+            // It means a message from the server with our name and a tempId didn't match any local tempId.
+            // Could be a message from another session/tab by the same user. Add it as a new server-confirmed message.
             return [...prevMessages, {
               ...receivedMessageFromServer,
               timestamp: receivedMessageFromServer.timestamp || Date.now(),
-              status: 'sent' // Mark as sent
+              status: 'sent' // Ensure it's marked as sent
             }];
           }
-        } else {
-          // Message from another user
+        } else if (receivedMessageFromServer.user === name && !receivedMessageFromServer.tempId) {
+          // Message from current user but without a tempId (e.g., from another session not using this optimistic logic)
+          // Or if server somehow didn't echo tempId for an own message. Add as new.
+          return [...prevMessages, {
+            ...receivedMessageFromServer,
+            timestamp: receivedMessageFromServer.timestamp || Date.now(),
+            status: 'sent' // Mark as sent
+          }];
+        }
+        else { // Message from another user
           const newIncomingMessage = {
             ...receivedMessageFromServer,
             timestamp: receivedMessageFromServer.timestamp || Date.now()
@@ -222,10 +229,10 @@ const Chat = ({ location }) => {
       };
 
       setMessages(prevMessages => [...prevMessages, optimisticMessage]);
-      socket.emit('sendMessage', message, () => {
-        // Callback from server after it has processed the message
-        // We will handle the definitive message update when it's broadcast back
-        // For now, just clear the input
+      // Send message text and tempId to the server
+      socket.emit('sendMessage', { text: message, tempId: tempId }, () => {
+        // Callback from server after it has processed the message.
+        // Input is cleared below. Nothing specific needed in callback for now.
       });
       setMessage(''); // Clear input after preparing to send
     }

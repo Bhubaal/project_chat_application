@@ -31,21 +31,24 @@ io.on('connect', (socket) => {
     callback();
   });
 
-  socket.on('sendMessage', (messageText, callback) => { // Renamed message to messageText for clarity
+  socket.on('sendMessage', ({ text, tempId }, callback) => { // Expects { text, tempId }
     const user = getUser(socket.id);
 
     if (user) { // Ensure user exists
-      const messageId = uuidv4();
+      const messageId = uuidv4(); // Server-generated final ID
       const messageData = {
         id: messageId,
+        tempId: tempId, // Echo back the client's temporary ID
         user: user.name,
-        text: messageText
+        text: text
       };
       io.to(user.room).emit('message', messageData);
     }
     // Consider sending an error back to sender if user is not found, though this is unlikely if they're connected
     callback();
   });
+
+  // Removed the duplicate sendMessage handler that was here
 
   socket.on('messageDelivered', (data) => {
     // data should contain { messageId, recipientName, senderName }
