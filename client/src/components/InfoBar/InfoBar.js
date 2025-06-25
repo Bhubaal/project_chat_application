@@ -5,8 +5,8 @@ import closeIcon from '../../icons/closeIcon.png';
 
 import './InfoBar.css';
 
-const InfoBar = ({ room }) => (
-  <div className="infoBar">
+const InfoBar = ({ room, onMouseDown }) => ( // Accept onMouseDown prop
+  <div className="infoBar" onMouseDown={onMouseDown}> {/* Attach onMouseDown */}
     <div className="leftInnerContainer">
       <img className="onlineIcon" src={onlineIcon} alt="online icon" />
       <h3>{room}</h3>

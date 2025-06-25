@@ -21,8 +21,50 @@ const Chat = ({ location }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState('connecting...'); // New state for connection status
+  const [connectionStatus, setConnectionStatus] = useState('connecting...');
 
+  // State for chat window draggable functionality
+  const [chatPosition, setChatPosition] = useState({ x: 200, y: 100 }); // Initial position
+  const [isChatDragging, setIsChatDragging] = useState(false);
+  const [chatOffset, setChatOffset] = useState({ x: 0, y: 0 });
+
+  // Mouse down on InfoBar
+  const handleChatMouseDown = (e) => {
+    if (e.button !== 0) return; // Only allow left mouse button
+    setIsChatDragging(true);
+    setChatOffset({
+      x: e.clientX - chatPosition.x,
+      y: e.clientY - chatPosition.y,
+    });
+    e.preventDefault(); // Prevent text selection or other default actions
+  };
+
+  // useEffect for handling chat window dragging
+  useEffect(() => {
+    const handleChatMouseMove = (e) => {
+      if (!isChatDragging) return;
+      setChatPosition({
+        x: e.clientX - chatOffset.x,
+        y: e.clientY - chatOffset.y,
+      });
+    };
+
+    const handleChatMouseUp = () => {
+      setIsChatDragging(false);
+    };
+
+    if (isChatDragging) {
+      window.addEventListener('mousemove', handleChatMouseMove);
+      window.addEventListener('mouseup', handleChatMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleChatMouseMove);
+      window.removeEventListener('mouseup', handleChatMouseUp);
+    };
+  }, [isChatDragging, chatOffset]);
+
+  // useEffect for socket connection and event listeners
   useEffect(() => {
     const { name: currentName, room: currentRoom } = queryString.parse(location.search);
 
@@ -77,7 +119,7 @@ const Chat = ({ location }) => {
       // Potentially disconnect socket here if connect_error implies no auto-reconnect for initial
       // if (socket) socket.disconnect(); // This might be too aggressive, depends on socket.io client config
     });
-    
+
     socket.io.on('reconnect_error', (err) => {
       setConnectionStatus('reconnection attempt error');
       // setError(`Reconnection Error: ${err.message}. Still trying...`); // Can be noisy
@@ -114,8 +156,16 @@ const Chat = ({ location }) => {
   return (
     <div className="outerContainer">
       <TextContainer users={users}/> {/* Moved to be before the main chat container */}
-      <div className="container">
-          <InfoBar room={room} />
+      <div
+        className="container"
+        style={{
+          position: 'absolute',
+          left: `${chatPosition.x}px`,
+          top: `${chatPosition.y}px`,
+          cursor: isChatDragging ? 'grabbing' : 'default', // Default cursor for container
+        }}
+      >
+          <InfoBar room={room} onMouseDown={handleChatMouseDown} /> {/* Pass down mouse down handler */}
           {connectionStatus && connectionStatus !== 'connected' && <p className="connectionStatusMessage">{connectionStatus}</p>}
           <Messages messages={messages} name={name} />
           {error && <p className="errorMessage">{error}</p>}

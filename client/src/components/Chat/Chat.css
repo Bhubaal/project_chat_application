@@ -4,6 +4,7 @@
   align-items: center;
   height: 100vh;
   background-color: #1A1A1D;
+  position: relative; /* Added to be the positioning context for absolute children */
 }
 
 .container {

@@ -10,7 +10,12 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
   height: 60px;
   width: 100%;
-  position: relative; /* Needed if we want to ensure it's on top of other elements if z-index issues arise */
+  position: relative;
+  cursor: grab; /* Add grab cursor to indicate it's draggable */
+}
+
+.infoBar:active {
+  cursor: grabbing; /* Change cursor when dragging */
 }
 
 .leftInnerContainer {
