@@ -42,7 +42,21 @@ const Message = ({ message: { text, user, timestamp }, name }) => {
           <p className="sentText pr-10">{trimmedName}</p>
           <div className="messageBox backgroundBlue">
             <p className="messageText colorWhite">{ReactEmoji.emojify(text)}</p>
-            {timestamp && <p className="messageTimestamp timestampWhite">{formattedTime}</p>}
+            <div className="messageMeta">
+              {timestamp && <p className="messageTimestamp timestampWhite">{formattedTime}</p>}
+              {message.status === 'sending' && (
+                <span className="messageTick singleTick">&#x2713;</span> // Sending tick
+              )}
+              {message.status === 'sent' && (
+                <span className="messageTick singleTick">&#x2713;</span> // Sent tick
+              )}
+              {message.status === 'delivered' && (
+                <span className="messageTick doubleTick">&#x2713;&#x2713;</span> // Delivered tick (grey)
+              )}
+              {message.status === 'read' && (
+                <span className="messageTick blueTick">&#x2713;&#x2713;</span> // Read tick (blue)
+              )}
+            </div>
           </div>
         </div>
         )
@@ -52,6 +66,7 @@ const Message = ({ message: { text, user, timestamp }, name }) => {
             <div className="messageBox backgroundBot"> {/* Distinct background for bot */}
               <p className="messageText colorDark">{ReactEmoji.emojify(text)}</p>
               {timestamp && <p className="messageTimestamp timestampDark">{formattedTime}</p>}
+              {/* No ticks for bot messages or messages from others */}
             </div>
             <p className="sentText pl-10 ">{user}</p> {/* Show "Bot" as user */}
           </div>
@@ -61,6 +76,7 @@ const Message = ({ message: { text, user, timestamp }, name }) => {
             <div className="messageBox backgroundLight">
               <p className="messageText colorDark">{ReactEmoji.emojify(text)}</p>
               {timestamp && <p className="messageTimestamp timestampDark">{formattedTime}</p>}
+              {/* No ticks for messages from others */}
             </div>
             <p className="sentText pl-10 ">{user}</p>
           </div>
