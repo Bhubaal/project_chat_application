@@ -16,6 +16,7 @@
   width: 80%;
   font-size: 1.1em; /* Standardized font size */
   color: white;
+  margin-right: 10px; /* Added gap before send button */
 }
 
 .input::placeholder {
@@ -35,20 +36,22 @@ input:focus, textarea:focus, select:focus{
   color: #fff !important;
   text-transform: uppercase;
   text-decoration: none;
-  /* background: #2979FF; */ /* Original */
-  background: rgba(41, 121, 255, 0.5); /* Semi-transparent blue */
-  padding: 15px 20px; /* Adjusted padding */
+  /* background: rgba(41, 121, 255, 0.5); */ /* Previous semi-transparent blue */
+  background: rgba(0, 123, 255, 0.6); /* Vibrant blue glass */
+  padding: 15px 20px;
   display: inline-block;
-  /* border: none; */ /* Original */
-  border: 1px solid rgba(41, 121, 255, 0.7);
-  border-radius: 10px; /* Consistent border-radius */
-  width: 20%;
+  /* border: 1px solid rgba(41, 121, 255, 0.7); */ /* Previous border */
+  border: 1px solid rgba(0, 123, 255, 0.8); /* Vibrant blue border */
+  border-radius: 10px;
+  width: calc(20% - 10px); /* Adjusted width to account for input's margin-right if form is not shrinking items */
   font-weight: bold;
   letter-spacing: 1px;
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .sendButton:hover {
-  background: rgba(41, 121, 255, 0.7);
-  border-color: rgba(41, 121, 255, 0.9);
+  /* background: rgba(41, 121, 255, 0.7); */ /* Previous hover */
+  background: rgba(0, 123, 255, 0.8); /* Vibrant blue hover */
+  /* border-color: rgba(41, 121, 255, 0.9); */ /* Previous hover border */
+  border-color: rgba(0, 123, 255, 1); /* Vibrant blue hover border */
 }
