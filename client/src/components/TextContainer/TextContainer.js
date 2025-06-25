@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Consolidated React import
 
-import onlineIcon from '../../icons/onlineIcon.png';
+import onlineIcon from '../../icons/onlineIcon.png'; // Keep one onlineIcon import
 
-import React, { useState, useEffect } from 'react'; // Import useState, useEffect
-
-import onlineIcon from '../../icons/onlineIcon.png';
+// Removed duplicate React import
+// Removed duplicate onlineIcon import
 
 import './TextContainer.css';
 
