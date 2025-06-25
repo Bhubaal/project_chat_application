@@ -2,10 +2,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #2979FF;
-  border-radius: 4px 4px 0 0;
+  /* background: #2979FF; */ /* Original background */
+  background: rgba(0, 0, 0, 0.15); /* Subtle dark overlay for glass theme */
+  border-radius: 10px 10px 0 0; /* Rounded top corners */
+  /* backdrop-filter: blur(5px); Consider if needed, might be too much with main blur */
+  /* -webkit-backdrop-filter: blur(5px); */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
   height: 60px;
   width: 100%;
+  position: relative; /* Needed if we want to ensure it's on top of other elements if z-index issues arise */
 }
 
 .leftInnerContainer {

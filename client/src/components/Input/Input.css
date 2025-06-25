@@ -1,27 +1,54 @@
 .form {
   display: flex;
-  border-top: 2px solid #D3D3D3;
+  /* border-top: 2px solid #D3D3D3; */ /* Original */
+  border-top: 1px solid rgba(255, 255, 255, 0.2); /* Glass theme border */
+  padding-top: 10px; /* Add some space above the input field itself */
+  margin-top: 10px; /* Add some space from messages if needed */
 }
 
 .input {
-  border: none;
-  border-radius: 0;
-  padding: 5%;
+  /* border: none; */ /* Original */
+  /* border-radius: 0; */ /* Original */
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+  padding: 15px 20px;
   width: 80%;
-  font-size: 1.2em;
+  font-size: 1.1em; /* Standardized font size */
+  color: white;
+}
+
+.input::placeholder {
+  color: rgba(230, 230, 230, 0.8);
 }
 
 input:focus, textarea:focus, select:focus{
   outline: none;
 }
 
+.input:focus {
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .sendButton {
   color: #fff !important;
   text-transform: uppercase;
   text-decoration: none;
-  background: #2979FF;
-  padding: 20px;
+  /* background: #2979FF; */ /* Original */
+  background: rgba(41, 121, 255, 0.5); /* Semi-transparent blue */
+  padding: 15px 20px; /* Adjusted padding */
   display: inline-block;
-  border: none;
+  /* border: none; */ /* Original */
+  border: 1px solid rgba(41, 121, 255, 0.7);
+  border-radius: 10px; /* Consistent border-radius */
   width: 20%;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.sendButton:hover {
+  background: rgba(41, 121, 255, 0.7);
+  border-color: rgba(41, 121, 255, 0.9);
 }
