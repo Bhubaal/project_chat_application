@@ -21,6 +21,12 @@
   height: 70%; /* Increased height slightly for better aesthetics with glass */
   width: 40%;   /* Increased width slightly */
   padding: 20px; /* Added padding for content spacing */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added for hover effects */
+}
+
+.container:hover {
+  transform: scale(1.02); /* Slightly enlarge on hover */
+  box-shadow: 0 12px 45px 0 rgba(0, 0, 0, 0.4); /* More pronounced shadow on hover */
 }
 
 @media (min-width: 320px) and (max-width: 480px) {
