@@ -4,9 +4,11 @@
   margin-left: 100px; /* This positions it to the right of the chat container */
   color: white;
   height: 60%; /* Maintain original height relative to viewport */
-  justify-content: space-between;
+  /* justify-content: space-between; */ /* Changed due to single content block */
+  justify-content: flex-start; /* Content starts from the top */
   width: 25%; /* Give it a defined width */
   padding: 20px;
+  overflow-y: auto; /* Handle long user lists */
 
   background: rgba(255, 255, 255, 0.08); /* Subtle glass */
   backdrop-filter: blur(8px);
@@ -18,8 +20,10 @@
 
 .activeContainer {
   display: flex;
-  align-items: center;
-  margin-bottom: 50%;
+  flex-direction: column; /* Changed to column for list items */
+  align-items: flex-start; /* Align items to the start */
+  /* margin-bottom: 50%; */ /* Original, too large */
+  margin-bottom: 20px; /* Reduced margin */
 }
 
 .activeItem {
