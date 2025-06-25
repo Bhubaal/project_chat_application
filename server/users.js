@@ -26,4 +26,11 @@ const getUser = (id) => users.find((user) => user.id === id);
 
 const getUsersInRoom = (room) => users.filter((user) => user.room === room);
 
-module.exports = { addUser, removeUser, getUser, getUsersInRoom };
+const getUserByName = (name) => {
+  if (name) {
+    return users.find((user) => user.name === name.trim().toLowerCase());
+  }
+  return null;
+};
+
+module.exports = { addUser, removeUser, getUser, getUsersInRoom, getUserByName };

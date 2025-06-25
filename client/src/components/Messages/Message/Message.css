@@ -99,28 +99,4 @@
   color: #707070;  /* Darker grey for light backgrounds */
 }
 
-.backgroundBot {
-  background: #e0ffe0; /* A light greenish background for bot messages */
-  /* Optionally, add a border or other distinct styling */
-  /* border: 1px solid #4CAF50; */
-}
-
-.messageContainer--bot .sentText {
-  /* Example: make bot name slightly different if desired */
-  /* font-style: italic; */
-  /* color: #4CAF50; */
-}
-
-.messageTimestamp {
-  font-size: 0.75em; /* Smaller font size */
-  margin-top: 5px;   /* Space above the timestamp */
-  text-align: right; /* Align to the right within the message box */
-}
-
-.timestampWhite {
-  color: #f0f0f0; /* Light grey for dark backgrounds */
-}
-
-.timestampDark {
-  color: #707070;  /* Darker grey for light backgrounds */
 }

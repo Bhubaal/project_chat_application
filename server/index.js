@@ -2,8 +2,9 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid'); // Import uuid
 
-const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
+const { addUser, removeUser, getUser, getUsersInRoom, getUserByName } = require('./users'); // Added getUserByName
 
 const router = require('./router');
 
@@ -30,12 +31,61 @@ io.on('connect', (socket) => {
     callback();
   });
 
-  socket.on('sendMessage', (message, callback) => {
+  socket.on('sendMessage', (messageText, callback) => { // Renamed message to messageText for clarity
     const user = getUser(socket.id);
 
-    io.to(user.room).emit('message', { user: user.name, text: message });
-
+    if (user) { // Ensure user exists
+      const messageId = uuidv4();
+      const messageData = {
+        id: messageId,
+        user: user.name,
+        text: messageText
+      };
+      io.to(user.room).emit('message', messageData);
+    }
+    // Consider sending an error back to sender if user is not found, though this is unlikely if they're connected
     callback();
+  });
+
+  socket.on('messageDelivered', (data) => {
+    // data should contain { messageId, recipientName, senderName }
+    const sender = getUserByName(data.senderName);
+    if (sender && sender.id) { // sender.id is the socket.id
+      // In Socket.IO v2.x, io.sockets.sockets is an object of sockets by id.
+      // In Socket.IO v3.x/v4.x, it's a Map: io.sockets.sockets.get(socketId)
+      // The package.json shows "socket.io": "^2.2.0", so it's v2.x.
+      const senderSocket = io.sockets.connected[sender.id];
+      if (senderSocket) {
+        senderSocket.emit('updateMessageStatus', {
+          messageId: data.messageId,
+          status: 'delivered',
+          deliveredTo: data.recipientName
+        });
+      } else {
+        // console.log(`Sender socket not found for ${data.senderName} with id ${sender.id}`);
+      }
+    } else {
+      // console.log(`Sender user not found: ${data.senderName}`);
+    }
+  });
+
+  socket.on('messageReadByRecipient', (data) => {
+    // data should contain { messageId, readerName, senderName }
+    const sender = getUserByName(data.senderName);
+    if (sender && sender.id) {
+      const senderSocket = io.sockets.connected[sender.id];
+      if (senderSocket) {
+        senderSocket.emit('updateMessageStatus', {
+          messageId: data.messageId,
+          status: 'read',
+          readBy: data.readerName
+        });
+      } else {
+        // console.log(`Sender socket not found for ${data.senderName} (for read status)`);
+      }
+    } else {
+      // console.log(`Sender user not found: ${data.senderName} (for read status)`);
+    }
   });
 
   socket.on('disconnect', () => {

@@ -81,12 +81,74 @@ const Chat = ({ location }) => {
     });
 
     // Setup event listeners on the new socket instance
-    socket.on('message', (receivedMessage) => {
-      const messageWithTimestamp = {
-        ...receivedMessage,
-        timestamp: receivedMessage.timestamp || Date.now(),
-      };
-      setMessages((prevMessages) => [...prevMessages, messageWithTimestamp]);
+    socket.on('message', (receivedMessageFromServer) => {
+      setMessages((prevMessages) => {
+        // Check if this is an echo of a message sent by the current user
+        if (receivedMessageFromServer.user === name) {
+          // Try to find the optimistic message to update it
+          // This simple heuristic assumes the last 'sending' message with matching text is the one.
+          // A more robust solution would involve matching by a temporary ID.
+          let foundOptimistic = false;
+          const updatedMessages = prevMessages.map(msg => {
+            if (msg.status === 'sending' && msg.text === receivedMessageFromServer.text && !foundOptimistic) {
+              foundOptimistic = true;
+              return {
+                ...msg,
+                id: receivedMessageFromServer.id, // Update with server ID
+                status: 'sent', // Update status
+                                // Server timestamp should be preferred if available and reliable
+                timestamp: receivedMessageFromServer.timestamp || msg.timestamp,
+              };
+            }
+            return msg;
+          });
+
+          if (foundOptimistic) {
+            return updatedMessages;
+          } else {
+            // If no optimistic message was found (e.g., if it's a message from another tab/device, or logic error)
+            // still add it, but ensure it has the 'sent' status if it's from the current user.
+            return [...prevMessages, {
+              ...receivedMessageFromServer,
+              timestamp: receivedMessageFromServer.timestamp || Date.now(),
+              status: 'sent' // Mark as sent
+            }];
+          }
+        } else {
+          // Message from another user
+          const newIncomingMessage = {
+            ...receivedMessageFromServer,
+            timestamp: receivedMessageFromServer.timestamp || Date.now()
+            // No 'status' needed for messages from others from this client's perspective of ticks
+          };
+
+          // If this client is the recipient, acknowledge delivery to the server
+          if (socket && receivedMessageFromServer.id) { // Ensure socket and messageId exist
+            socket.emit('messageDelivered', {
+              messageId: receivedMessageFromServer.id,
+              recipientName: name, // Current user is the recipient
+              senderName: receivedMessageFromServer.user
+            });
+            // Also, immediately acknowledge that this message has been "read" by this recipient
+            socket.emit('messageReadByRecipient', {
+              messageId: receivedMessageFromServer.id,
+              readerName: name, // Current user is the reader
+              senderName: receivedMessageFromServer.user
+            });
+          }
+          return [...prevMessages, newIncomingMessage];
+        }
+      });
+    });
+
+    socket.on('updateMessageStatus', ({ messageId, status, deliveredTo }) => {
+      setMessages(prevMessages =>
+        prevMessages.map(msg =>
+          msg.id === messageId ? { ...msg, status: status } : msg
+        )
+      );
+      // TODO: In group chat, 'deliveredTo' could be used to update a list of recipients
+      // For now, any 'delivered' status updates the message for the sender.
     });
 
     socket.on('roomData', ({ users: newUsers }) => {
@@ -133,6 +195,7 @@ const Chat = ({ location }) => {
         // Remove all listeners associated with this socket instance
         socket.off('message');
         socket.off('roomData');
+        socket.off('updateMessageStatus'); // Added cleanup
         socket.off('connect');
         socket.off('disconnect');
         socket.off('connect_error');
@@ -148,8 +211,23 @@ const Chat = ({ location }) => {
   const sendMessage = (event) => {
     event.preventDefault();
 
-    if (message && socket) { // Check if socket is initialized
-      socket.emit('sendMessage', message, () => setMessage(''));
+    if (message && socket) {
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const optimisticMessage = {
+        id: tempId, // Temporary client-side ID
+        user: name, // Current user's name
+        text: message,
+        timestamp: Date.now(), // Optimistic timestamp
+        status: 'sending', // Initial status
+      };
+
+      setMessages(prevMessages => [...prevMessages, optimisticMessage]);
+      socket.emit('sendMessage', message, () => {
+        // Callback from server after it has processed the message
+        // We will handle the definitive message update when it's broadcast back
+        // For now, just clear the input
+      });
+      setMessage(''); // Clear input after preparing to send
     }
   }
 
