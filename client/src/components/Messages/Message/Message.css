@@ -99,39 +99,4 @@
   color: #707070;  /* Darker grey for light backgrounds */
 }
 
-.messageMeta {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* Aligns timestamp and ticks to the right */
-  margin-top: 5px;
-  font-size: 0.75em;
-}
-
-.messageTimestamp {
-  /* font-size: 0.75em; */ /* Moved to .messageMeta */
-  /* margin-top: 5px; */   /* Moved to .messageMeta */
-  /* text-align: right; */ /* Handled by justify-content in .messageMeta */
-  margin-right: 5px; /* Space between timestamp and tick */
-}
-
-/* Base tick style */
-.messageTick {
-  display: inline-block;
-  font-weight: bold;
-  line-height: 1; /* Ensure ticks align well with text */
-}
-
-.singleTick {
-  color: #f0f0f0; /* Same as timestampWhite for consistency on dark backgrounds */
-  /* For light backgrounds, this might need a .singleTickDark if used there */
-}
-
-.doubleTick {
-  color: #f0f0f0; /* Grey double tick for 'delivered' */
-  letter-spacing: -3px; /* Adjust spacing to make ticks closer */
-}
-
-.blueTick { /* Placeholder for later use */
-  color: #4FC3F7; /* WhatsApp blue tick color */
-  letter-spacing: -3px;
 }
