@@ -1,10 +1,19 @@
 .textContainer {
   display: flex;
   flex-direction: column;
-  margin-left: 100px;
+  margin-left: 100px; /* This positions it to the right of the chat container */
   color: white;
-  height: 60%;
+  height: 60%; /* Maintain original height relative to viewport */
   justify-content: space-between;
+  width: 25%; /* Give it a defined width */
+  padding: 20px;
+
+  background: rgba(255, 255, 255, 0.08); /* Subtle glass */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  /* box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1); */ /* Optional subtle shadow */
 }
 
 .activeContainer {

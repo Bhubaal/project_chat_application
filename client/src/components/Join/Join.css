@@ -23,12 +23,33 @@ html, body {
 
 .joinInnerContainer {
   width: 20%;
+  padding: 40px; /* Added padding */
+  background: rgba(255, 255, 255, 0.1); /* Glassmorphism background */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari */
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Subtle shadow */
 }
 
 .joinInput {
-  border-radius: 0;
+  border-radius: 10px; /* Updated */
   padding: 15px 20px;
   width: 100%;
+  background: rgba(255, 255, 255, 0.2); /* Glass style */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 1.1em; /* Slightly larger text */
+}
+
+.joinInput::placeholder {
+  color: rgba(230, 230, 230, 0.8);
+}
+
+.joinInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.7); /* Highlight focus */
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .heading {
@@ -42,12 +63,20 @@ html, body {
     color: #fff !important;
     text-transform: uppercase;
     text-decoration: none;
-    background: #2979FF;
-    padding: 20px;
-    border-radius: 5px;
+    background: rgba(41, 121, 255, 0.5); /* Semi-transparent blue */
+    padding: 15px 20px; /* Adjusted padding to match input more closely if desired */
+    border-radius: 10px; /* Consistent border-radius */
     display: inline-block;
-    border: none;
+    border: 1px solid rgba(41, 121, 255, 0.7); /* Subtle border */
     width: 100%;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+}
+
+.button:hover {
+  background: rgba(41, 121, 255, 0.7); /* Darken/intensify on hover */
+  border-color: rgba(41, 121, 255, 0.9);
 }
 
 .mt-20 {

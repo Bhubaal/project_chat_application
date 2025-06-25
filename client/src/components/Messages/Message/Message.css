@@ -55,15 +55,48 @@
 }
 
 .colorDark {
-  color: #353535;
+  color: #353535; /* Ensure this is dark enough for light glass */
 }
 
 .backgroundBlue {
-  background: #2979FF;
+  /* background: #2979FF; */ /* Original */
+  background: rgba(41, 121, 255, 0.6); /* Opaque blue glass */
+  border: 1px solid rgba(41, 121, 255, 0.8);
+  /* color: white; Ensure .colorWhite is applied or set text color here */
 }
 
 .backgroundLight {
-  background: #F3F3F3;
+  /* background: #F3F3F3; */ /* Original */
+  background: rgba(255, 255, 255, 0.4); /* Opaque light glass */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  /* color: #353535; Ensure .colorDark is applied or set text color here */
+}
+
+.backgroundBot {
+  /* background: #e0ffe0; */ /* Original */
+  background: rgba(200, 255, 200, 0.5); /* Opaque greenish glass */
+  border: 1px solid rgba(200, 255, 200, 0.7);
+  /* color: #353535; Ensure .colorDark is applied or set text color here */
+}
+
+.messageContainer--bot .sentText {
+  /* Example: make bot name slightly different if desired */
+  /* font-style: italic; */
+  /* color: #4CAF50; */
+}
+
+.messageTimestamp {
+  font-size: 0.75em; /* Smaller font size */
+  margin-top: 5px;   /* Space above the timestamp */
+  text-align: right; /* Align to the right within the message box */
+}
+
+.timestampWhite {
+  color: #f0f0f0; /* Light grey for dark backgrounds */
+}
+
+.timestampDark {
+  color: #707070;  /* Darker grey for light backgrounds */
 }
 
 .backgroundBot {
