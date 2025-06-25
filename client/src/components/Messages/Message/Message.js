@@ -11,7 +11,8 @@ const formatTimestamp = (timestamp) => {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
-const Message = ({ message: { text, user, timestamp }, name }) => {
+// Destructure status from message prop
+const Message = ({ message: { text, user, timestamp, status }, name }) => {
   let isSentByCurrentUser = false;
   const BOT_USER_NAME = "bot"; // Define bot name, case-insensitive check later
 
@@ -44,16 +45,16 @@ const Message = ({ message: { text, user, timestamp }, name }) => {
             <p className="messageText colorWhite">{ReactEmoji.emojify(text)}</p>
             <div className="messageMeta">
               {timestamp && <p className="messageTimestamp timestampWhite">{formattedTime}</p>}
-              {message.status === 'sending' && (
+              {status === 'sending' && ( // Use destructured status
                 <span className="messageTick singleTick">&#x2713;</span> // Sending tick
               )}
-              {message.status === 'sent' && (
+              {status === 'sent' && ( // Use destructured status
                 <span className="messageTick singleTick">&#x2713;</span> // Sent tick
               )}
-              {message.status === 'delivered' && (
+              {status === 'delivered' && ( // Use destructured status
                 <span className="messageTick doubleTick">&#x2713;&#x2713;</span> // Delivered tick (grey)
               )}
-              {message.status === 'read' && (
+              {status === 'read' && ( // Use destructured status
                 <span className="messageTick blueTick">&#x2713;&#x2713;</span> // Read tick (blue)
               )}
             </div>
