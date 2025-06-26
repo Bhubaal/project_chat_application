@@ -83,67 +83,81 @@ const Chat = ({ location }) => {
     // Setup event listeners on the new socket instance
     socket.on('message', (receivedMessageFromServer) => {
       setMessages((prevMessages) => {
-        // Check if this is an echo of a message sent by the current user
         if (receivedMessageFromServer.user === name && receivedMessageFromServer.tempId) {
-          // This is an echo of a message sent by the current user, identified by tempId
-          let messageUpdated = false;
-          const updatedMessages = prevMessages.map(msg => {
-            if (msg.id === receivedMessageFromServer.tempId) { // Match optimistic message by its tempId
-              messageUpdated = true;
-              return {
-                ...msg, // Keep other optimistic properties like original text if needed
-                id: receivedMessageFromServer.id, // Update with the final server-assigned ID
-                status: 'sent',                 // Update status
-                timestamp: receivedMessageFromServer.timestamp || msg.timestamp, // Prefer server timestamp
-                // text: receivedMessageFromServer.text, // Usually same, but server is source of truth
-              };
-            }
-            return msg;
-          });
+          // Current user's message echoed back, try to find and update the optimistic one
+          const optimisticMessageIndex = prevMessages.findIndex(
+            (msg) => msg.id === receivedMessageFromServer.tempId && msg.status === 'sending'
+          );
 
-          if (messageUpdated) {
+          if (optimisticMessageIndex !== -1) {
+            // Found the optimistic message, update it
+            const updatedMessages = [...prevMessages];
+            updatedMessages[optimisticMessageIndex] = {
+              ...prevMessages[optimisticMessageIndex],
+              id: receivedMessageFromServer.id,        // Final server ID
+              status: 'sent',                          // Update status
+              text: receivedMessageFromServer.text,    // Use server's text as source of truth
+              timestamp: receivedMessageFromServer.timestamp || prevMessages[optimisticMessageIndex].timestamp,
+            };
             return updatedMessages;
           } else {
-            // This case should ideally not happen if tempId logic is correct.
-            // It means a message from the server with our name and a tempId didn't match any local tempId.
-            // Could be a message from another session/tab by the same user. Add it as a new server-confirmed message.
-            return [...prevMessages, {
-              ...receivedMessageFromServer,
-              timestamp: receivedMessageFromServer.timestamp || Date.now(),
-              status: 'sent' // Ensure it's marked as sent
-            }];
+            // Optimistic message with this tempId not found (or already updated).
+            // Check if a message with the FINAL ID already exists to prevent duplicates.
+            const existingFinalMessage = prevMessages.find(msg => msg.id === receivedMessageFromServer.id);
+            if (!existingFinalMessage) {
+              return [
+                ...prevMessages,
+                {
+                  ...receivedMessageFromServer,
+                  timestamp: receivedMessageFromServer.timestamp || Date.now(),
+                  status: 'sent',
+                },
+              ];
+            } else {
+              return prevMessages; // Already have this message by final ID
+            }
           }
         } else if (receivedMessageFromServer.user === name && !receivedMessageFromServer.tempId) {
-          // Message from current user but without a tempId (e.g., from another session not using this optimistic logic)
-          // Or if server somehow didn't echo tempId for an own message. Add as new.
-          return [...prevMessages, {
-            ...receivedMessageFromServer,
-            timestamp: receivedMessageFromServer.timestamp || Date.now(),
-            status: 'sent' // Mark as sent
-          }];
-        }
-        else { // Message from another user
-          const newIncomingMessage = {
-            ...receivedMessageFromServer,
-            timestamp: receivedMessageFromServer.timestamp || Date.now()
-            // No 'status' needed for messages from others from this client's perspective of ticks
-          };
-
-          // If this client is the recipient, acknowledge delivery to the server
-          if (socket && receivedMessageFromServer.id) { // Ensure socket and messageId exist
-            socket.emit('messageDelivered', {
-              messageId: receivedMessageFromServer.id,
-              recipientName: name, // Current user is the recipient
-              senderName: receivedMessageFromServer.user
-            });
-            // Also, immediately acknowledge that this message has been "read" by this recipient
-            socket.emit('messageReadByRecipient', {
-              messageId: receivedMessageFromServer.id,
-              readerName: name, // Current user is the reader
-              senderName: receivedMessageFromServer.user
-            });
+          // Own message from server, but no tempId (e.g., from another session)
+          // Check if it already exists by final ID before adding
+           const existingFinalMessage = prevMessages.find(msg => msg.id === receivedMessageFromServer.id);
+           if (!existingFinalMessage) {
+            return [
+                ...prevMessages,
+                {
+                  ...receivedMessageFromServer,
+                  timestamp: receivedMessageFromServer.timestamp || Date.now(),
+                  status: 'sent',
+                },
+              ];
+           } else {
+             return prevMessages; // Already exists
+           }
+        } else { // Message from another user
+          // Check if it already exists by final ID before adding
+          const existingFinalMessage = prevMessages.find(msg => msg.id === receivedMessageFromServer.id);
+          if (!existingFinalMessage) {
+            const newIncomingMessage = {
+              ...receivedMessageFromServer,
+              timestamp: receivedMessageFromServer.timestamp || Date.now(),
+            };
+            // Acknowledge delivery and read for other's messages
+            if (socket && receivedMessageFromServer.id) {
+              socket.emit('messageDelivered', {
+                messageId: receivedMessageFromServer.id,
+                recipientName: name,
+                senderName: receivedMessageFromServer.user
+              });
+              socket.emit('messageReadByRecipient', {
+                messageId: receivedMessageFromServer.id,
+                readerName: name,
+                senderName: receivedMessageFromServer.user
+              });
+            }
+            return [...prevMessages, newIncomingMessage];
+          } else {
+            return prevMessages; // Already have this message by final ID
           }
-          return [...prevMessages, newIncomingMessage];
         }
       });
     });
