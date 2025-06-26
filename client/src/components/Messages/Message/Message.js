@@ -45,17 +45,11 @@ const Message = ({ message: { text, user, timestamp, status }, name }) => {
             <p className="messageText colorWhite">{ReactEmoji.emojify(text)}</p>
             <div className="messageMeta">
               {timestamp && <p className="messageTimestamp timestampWhite">{formattedTime}</p>}
-              {status === 'sending' && ( // Use destructured status
-                <span className="messageTick singleTick">&#x2713;</span> // Sending tick
+              {(status === 'sending' || status === 'sent' || status === 'delivered') && (
+                <span className="messageTick singleTick">&#x2713;</span> // Single grey tick
               )}
-              {status === 'sent' && ( // Use destructured status
-                <span className="messageTick singleTick">&#x2713;</span> // Sent tick
-              )}
-              {status === 'delivered' && ( // Use destructured status
-                <span className="messageTick doubleTick">&#x2713;&#x2713;</span> // Delivered tick (grey)
-              )}
-              {status === 'read' && ( // Use destructured status
-                <span className="messageTick blueTick">&#x2713;&#x2713;</span> // Read tick (blue)
+              {status === 'read' && (
+                <span className="messageTick blueTick">&#x2713;&#x2713;</span> // Double blue tick
               )}
             </div>
           </div>
